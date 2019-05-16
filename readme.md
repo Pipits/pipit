@@ -77,7 +77,7 @@ pipit_template($template, $data, $opts, $return);
 
 Options array:
 
-| Type       | Description                                                    |
+| Option     | Description                                                    |
 |------------|----------------------------------------------------------------|
 | namespace  | Template name space. Default `content`                         |
 | count      | The number of items to display.                                |
