@@ -90,7 +90,8 @@
         $Template->set($template, $opts['namespace']);
 
 
-        // associate array rendered as a single item ['name' => 'John Silver'], otherwise render as a group [['name' => 'John Silver'], ['name' => 'Jason Bourne']]
+        // associate array rendered as a single item ['name' => 'John Silver'],
+        // otherwise render as a group [['name' => 'John Silver'], ['name' => 'Jason Bourne']]
         if (!PerchUtil::is_assoc($data)) {
 
             if(isset($opts['paginate']) && isset($opts['count'])) {
@@ -128,6 +129,11 @@
         }
         
 
+        // layout includes, forms, etc
+        $html = $Template->apply_runtime_post_processing($html);
+        
+
         if($return) return $html;
         echo $html;
+        PerchUtil::flush_output();
     }
