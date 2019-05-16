@@ -16,10 +16,11 @@
      * 
      * @param string $str           element key $_GET[$str]
      * @param bool $return_array    returns the value as an array
+     * @param mixed $default        default value to be returned if $_GET[$str] does not exist
      * 
      * @return string|array
      */
-    function pipit_get($str, $return_array = false) {
+    function pipit_get($str, $return_array = false, $default = false) {
         
         if(isset($_GET[$str])) {
             if(is_array($_GET[$str])) {
@@ -42,7 +43,7 @@
             }
         }
 
-        return false;
+        return $default;
     }
 
 
