@@ -62,3 +62,32 @@ Check if a the site visitor is logged into the site's Perch control panel. Note 
 Renders a template at run time similar to `perch_template()`. 
 
 `pipit_template()` allows you to set your own template name space and to paginate your items.
+
+```php
+pipit_template($template, $data, $opts, $return);
+```
+
+| Type       | Description                                                    |
+|------------|----------------------------------------------------------------|
+| String     | Template path                                                  |
+| Array      | Data array                                                     |
+| Array      | Options array, see below                                       |
+| Boolean    | Set to `true` to have the templated html returned instead of echoed.    |
+
+
+Options array:
+
+| Type       | Description                                                    |
+|------------|----------------------------------------------------------------|
+| namespace  | Template name space. Default `content`                         |
+| count      | The number of items to display.                                |
+| paginate   | Boolean. Set to `true` to use pagination                       |
+| page-links | Create numbered page links for pagination.                     |
+
+
+```php
+pipit_template('render/list.html', $data, [
+    'count' => 6,
+    'paginate' => true,
+]);
+```
