@@ -70,6 +70,36 @@
 
 
     /**
+     * Cache bust CSS and JS
+     * 
+     * @param string $path   Path to an asset file
+     * @param string $type   Type of version
+     * 
+     */
+    function pipit_version($path, $type = 'param') {
+        $full_path = dirname(PERCH_PATH) . $path;
+        if (file_exists($full_path)) {
+            $path_info = pathinfo($path);
+            $filename = substr($path, 0, strrpos($path, '.'));
+            
+
+            switch($type) {
+                case 'param':
+                    echo $path . '?v=' . filemtime($full_path);
+                    break;
+
+                case 'name':
+                    echo $filename . '.' . filemtime($full_path) . '.' . $path_info['extension'];
+                    break;
+            }
+        }
+    }
+
+
+
+
+
+    /**
      * Renders a Perch template
      * 
      * @param string $template  Template path
