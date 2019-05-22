@@ -100,6 +100,29 @@
 
 
     /**
+     * Get language string from URL with the pattern /{lang}/my-page
+     * 
+     * @param array $accepted_langs     array of accepted languages
+     * @param string $default_lang      default language string
+     * 
+     * @return string
+     */
+    function pipit_get_lang($accepted_langs, $default_lang =''){
+        $url = perch_page_url(['include-domain' => false], true);
+        $url_parts = explode('/', $url);
+
+        if(isset($url_parts[1]) && in_array($url_parts[1], $accepted_langs)) {
+            return $url_parts[1];
+        } else {
+            return $default_lang;
+        }
+    }
+
+
+
+
+
+    /**
      * Renders a Perch template
      * 
      * @param string $template  Template path
