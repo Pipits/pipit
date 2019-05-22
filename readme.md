@@ -91,3 +91,40 @@ pipit_template('render/list.html', $data, [
     'paginate' => true,
 ]);
 ```
+
+
+
+
+### pipit_version()
+
+Adds the last modified time of a file for easier browser cache busting.
+
+To add the last modified time as a query string (default):
+
+```php
+<script src="<?php echo pipit_version('/js/app.js'); ?>"></script>
+```
+
+Output:
+
+```php
+<script src="/js/app.js?v=1511342726"></script>
+```
+
+To add the last modified time as part of the file's name you need to set the second argument to `name`:
+
+```php
+<script src="<?php echo pipit_version('/js/app.js', 'name'); ?>"></script>
+```
+
+Output:
+
+```php
+<script src="/js/app.1511342726.js"></script>
+```
+
+And you'll need to add the following .htaccess rules:
+
+```
+RewriteRule ^(.+)\.(\d+)\.(js|css)$ $1.$3 [L]
+```
