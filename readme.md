@@ -128,3 +128,24 @@ And you'll need to add the following .htaccess rules:
 ```
 RewriteRule ^(.+)\.(\d+)\.(js|css)$ $1.$3 [L]
 ```
+
+
+
+### pipit_get_lang()
+
+The function gets the language string from a URL with the patter `/{lang}/my-page`.
+
+```php
+pipit_get_lang($accepted_langs, $default_lang)
+```
+
+
+| Type       | Description                                                    |
+|------------|----------------------------------------------------------------|
+| Array      | Array of accepted language strings                             |
+| String     | Default language if none found                                 |
+
+
+```php
+$lang = pipit_get_lang(['en', 'ru', 'ar'], 'en');
+```
