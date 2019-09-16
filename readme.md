@@ -149,3 +149,54 @@ pipit_get_lang($accepted_langs, $default_lang)
 ```php
 $lang = pipit_get_lang(['en', 'ru', 'ar'], 'en');
 ```
+
+
+
+
+
+
+
+## Category Functions
+
+### pipit_category_set()
+
+Outputs a Category Set.
+
+```php
+pipit_category_set($slug, $opts, $return);
+```
+
+| Type       | Description                                                    |
+|------------|----------------------------------------------------------------|
+| String     | Category Set slug                                              |
+| Array      | Options array, see below                                       |
+| Boolean    | Set to `true` to have the templated html returned instead of echoed.    |
+
+
+Options array:
+
+| Option     | Description                                                    |
+|------------|----------------------------------------------------------------|
+| template   | Template path. Default `categories/set.html`                   |
+| skip-template  | True or false. Bypass template processing and return the content in an associative array. |
+| return-html    | True or false. For use with `skip-template`. Adds the HTML onto the end of the returned array with key `html`. |
+
+
+
+```php
+pipit_category_set('products');
+```
+
+```php
+$set_html = pipit_category_set('products', [], true);
+echo $set_html;
+```
+
+```php
+$set = pipit_category_set('products', [
+    'skip-template' => true,
+    'return-html' => true,
+]);
+
+echo $set['html'];
+```
