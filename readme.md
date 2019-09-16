@@ -200,3 +200,64 @@ $set = pipit_category_set('products', [
 
 echo $set['html'];
 ```
+
+
+
+
+### pipit_category_get_path()
+
+When you have a categories field in a template (e.g. Collection item), Perch in some cases stores categories by their IDs and in other cases by their category paths. This makes it inconvenient when you skip templating and try to use the categories values. 
+
+```html
+<perch:content id="name" type="text" label="Product Name">
+<perch:content id="slug" type="slug" for="name">
+<perch:categories id="categories" set="products" label="Categories" />
+```
+
+
+```php
+    $products = perch_collection('Products', [
+        'skip-template' => true,
+        'filter' => 'slug',
+        'value' => 'my-product',
+    ]);
+
+    foreach($products as $product) {
+        foreach($product['categories'] as $category) {
+            // $category can be a path e.g. products/shoes/
+            // or it can be an ID e.g. 34
+        }
+    }
+```
+
+A lot of the time you need the category path instead of the ID because [category filtering](https://docs.grabaperch.com/perch/categories/filtering/) requires paths. A common use-case is using the category paths for outputting similar items on an item's detail page.
+
+`pipit_category_get_path()` takes the returned category source and returns the category path.
+
+```php
+pipit_category_get_path($source);
+```
+
+
+```php
+    $products = perch_collection('Products', [
+        'skip-template' => true,
+        'filter' => 'slug',
+        'value' => 'my-product',
+    ]);
+
+    $categories = array();
+    foreach($products as $product) {
+        foreach($product['categories'] as $category) {
+            $categories[] = pipit_category_get_path($category);
+        }
+    }
+
+    // similar products
+    perch_collection('Products', [
+        'category' => $categories,
+        'filter' => 'slug',
+        'match' => 'neq',
+        'value' => 'my-product',
+    ]);
+```
