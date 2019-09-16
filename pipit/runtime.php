@@ -247,3 +247,36 @@
             return $set_array;
         }
     }
+
+
+
+
+
+
+    /**
+     * Get category path from ID
+     * 
+     * @param string $source    Category ID
+     * 
+     * @return string|boolean
+     */
+    function pipit_category_get_path($source){
+        // do we have an ID?
+        if(is_numeric($source)) {
+            $cat = perch_categories([
+                'filter' => 'catID',
+                'value' => $source,
+                'skip-template' => true,
+            ]);
+          
+            if($cat) return $cat[0]['catPath'];
+          
+  
+        } else {
+            // we have a string - it's catPath
+            return $source;
+        }
+
+
+        return false;
+    }
