@@ -190,3 +190,60 @@
         echo $html;
         PerchUtil::flush_output();
     }
+
+
+
+
+    
+    /**
+     * Outputs a category set
+     * 
+     * @param string $slug      Category Set slug
+     * @param array $opts       Options array
+     * @param bool $return      Set to true to have the rendered template returned instead of echoed
+     * 
+     */
+    function pipit_category_set($slug, $opts = array(), $return = false) {
+        $API  = new PerchAPI(1.0, 'pipit');
+        $Sets = new PerchCategories_Sets($API);
+
+        $Set = $Sets->get_one_by('setSlug', $slug);
+
+        if(!$Set) {
+            PerchUtil::debug("Category Set with the slug '$slug' could not be found", 'notice');
+            return false;
+        }
+        
+
+        $default_opts = ['template' => 'categories/set.html'];
+        $opts = array_merge($default_opts, $opts);
+        $set_array = $Set->to_array();
+        $render = true;
+
+
+        if(isset($opts['skip-template']) && $opts['skip-template'] == true) {
+            $render = false;
+
+            if(isset($opts['return-html']) && $opts['return-html'] == true) {
+                $render = true;
+            }
+        }
+
+
+        if($render) {
+            $html = pipit_template($opts['template'], $set_array, ['namespace' => 'categories'], true);
+
+            if(isset($opts['skip-template']) && $opts['skip-template'] == true) {
+                $result = $set_array;
+                $result['html'] = $html;
+                return $result;
+            }
+
+            if($return) return $html;
+            echo $html;
+            
+
+        } else {
+            return $set_array;
+        }
+    }
