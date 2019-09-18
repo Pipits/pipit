@@ -262,7 +262,7 @@ A lot of the time you need the category path instead of the ID because [category
 ```
 
 
-The function only attempts to get a category path if `$source` is numerical. If `$source` is a string, the function will return the string without checking whether the string is in fact a category path. So it is your responsibility to use the function in the right context.
+The function only attempts to retrieve the category path if `$source` is numerical. If `$source` is not numerical, the function will return the string without checking whether it is in fact a category path. This is because `$source` is expected to be either a category ID e.g. `34` or a category path `products/shoes/`.
 
 
 
@@ -274,6 +274,10 @@ The function only attempts to get a category path if `$source` is numerical. If 
 
 Perch in some cases stores categories by their IDs and in other cases by their category paths. A common use-case for needing the category ID instead of the path is for rendering templates with `perch_template()`.
 
+
+```php
+pipit_category_get_id($source);
+```
 
 ```php
     $product = perch_collection('Products', [
@@ -298,3 +302,6 @@ Perch in some cases stores categories by their IDs and in other cases by their c
     }
     
 ```
+
+
+The function only attempts to retrieve the category ID if `$source` is not numerical. If `$source` is numerical, the function will return the numerical value without checking whether it is in fact a category ID. This is because `$source` is expected to be either a category ID e.g. `34` or a category path `products/shoes/`.
