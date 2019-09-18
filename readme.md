@@ -263,3 +263,38 @@ A lot of the time you need the category path instead of the ID because [category
 
 
 The function only attempts to get a category path if `$source` is numerical. If `$source` is a string, the function will return the string without checking whether the string is in fact a category path. So it is your responsibility to use the function in the right context.
+
+
+
+
+
+### pipit_category_get_id()
+
+`pipit_category_get_id()` takes the returned category source (typically when you use the `skip-template` option) and returns the category ID. The function is similar to `pipit_category_get_path()`, but returns the category ID.
+
+Perch in some cases stores categories by their IDs and in other cases by their category paths. A common use-case for needing the category ID instead of the path is for rendering templates with `perch_template()`.
+
+
+```php
+    $product = perch_collection('Products', [
+        'template' => 'products/detail.html',
+        'skip-template' => true,
+        'return-html' => true,
+        'filter' => 'slug',
+        'value' => 'my-product',
+    ]);
+
+
+    if(isset($product[0])) {
+        array_walk($product[0]['categories'], function(&$category) {
+            $category = pipit_category_get_id($category);
+        })
+
+        // output rendered content/products/detail.html
+        echo $product['html'];
+
+        // render another template using the same product data without making another database query
+        perch_template('content/products/another_template.html', $product[0]);
+    }
+    
+```
