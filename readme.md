@@ -206,6 +206,12 @@ echo $set['html'];
 
 ### pipit_category_get_path()
 
+`pipit_category_get_path()` takes the returned category source (typically when you use the `skip-template` option) and returns the category path.
+
+```php
+pipit_category_get_path($source);
+```
+
 When you have a categories field in a template (e.g. Collection item), Perch in some cases stores categories by their IDs and in other cases by their category paths. This makes it inconvenient when you skip templating and try to use the categories values. 
 
 ```html
@@ -213,7 +219,6 @@ When you have a categories field in a template (e.g. Collection item), Perch in 
 <perch:content id="slug" type="slug" for="name">
 <perch:categories id="categories" set="products" label="Categories" />
 ```
-
 
 ```php
     $products = perch_collection('Products', [
@@ -231,12 +236,6 @@ When you have a categories field in a template (e.g. Collection item), Perch in 
 ```
 
 A lot of the time you need the category path instead of the ID because [category filtering](https://docs.grabaperch.com/perch/categories/filtering/) requires paths. A common use-case is using the category paths for outputting similar items on an item's detail page.
-
-`pipit_category_get_path()` takes the returned category source and returns the category path.
-
-```php
-pipit_category_get_path($source);
-```
 
 
 ```php
@@ -261,3 +260,6 @@ pipit_category_get_path($source);
         'value' => 'my-product',
     ]);
 ```
+
+
+The function only attempts to get a category path if `$source` is numerical. If `$source` is a string, the function will return the string without checking whether the string is in fact a category path. So it is your responsibility to use the function in the right context.
