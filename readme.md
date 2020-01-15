@@ -305,3 +305,19 @@ pipit_category_get_id($source);
 
 
 The function only attempts to retrieve the category ID if `$source` is not numerical. If `$source` is numerical, the function will return the numerical value without checking whether it is in fact a category ID. This is because `$source` is expected to be either a category ID e.g. `34` or a category path `products/shoes/`.
+
+
+
+
+### pipit_get_collection_key_for()
+
+Get the key of the collection an item belongs to.
+
+```php
+    perch_collection(['Blog', 'News'], [
+        'each' => function($item) {
+            $item['collectionKey'] = pipit_get_collection_key_for($item['_id']);
+            return $item;
+        }
+    ]);
+```
