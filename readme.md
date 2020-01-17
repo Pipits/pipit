@@ -221,44 +221,44 @@ When you have a categories field in a template (e.g. Collection item), Perch in 
 ```
 
 ```php
-    $products = perch_collection('Products', [
-        'skip-template' => true,
-        'filter' => 'slug',
-        'value' => 'my-product',
-    ]);
+$products = perch_collection('Products', [
+    'skip-template' => true,
+    'filter' => 'slug',
+    'value' => 'my-product',
+]);
 
-    foreach($products as $product) {
-        foreach($product['categories'] as $category) {
-            // $category can be a path e.g. products/shoes/
-            // or it can be an ID e.g. 34
-        }
+foreach($products as $product) {
+    foreach($product['categories'] as $category) {
+        // $category can be a path e.g. products/shoes/
+        // or it can be an ID e.g. 34
     }
+}
 ```
 
 A lot of the time you need the category path instead of the ID because [category filtering](https://docs.grabaperch.com/perch/categories/filtering/) requires paths. A common use-case is using the category paths for outputting similar items on an item's detail page.
 
 
 ```php
-    $products = perch_collection('Products', [
-        'skip-template' => true,
-        'filter' => 'slug',
-        'value' => 'my-product',
-    ]);
+$products = perch_collection('Products', [
+    'skip-template' => true,
+    'filter' => 'slug',
+    'value' => 'my-product',
+]);
 
-    $categories = array();
-    foreach($products as $product) {
-        foreach($product['categories'] as $category) {
-            $categories[] = pipit_category_get_path($category);
-        }
+$categories = array();
+foreach($products as $product) {
+    foreach($product['categories'] as $category) {
+        $categories[] = pipit_category_get_path($category);
     }
+}
 
-    // similar products
-    perch_collection('Products', [
-        'category' => $categories,
-        'filter' => 'slug',
-        'match' => 'neq',
-        'value' => 'my-product',
-    ]);
+// similar products
+perch_collection('Products', [
+    'category' => $categories,
+    'filter' => 'slug',
+    'match' => 'neq',
+    'value' => 'my-product',
+]);
 ```
 
 
@@ -280,27 +280,26 @@ pipit_category_get_id($source);
 ```
 
 ```php
-    $product = perch_collection('Products', [
-        'template' => 'products/detail.html',
-        'skip-template' => true,
-        'return-html' => true,
-        'filter' => 'slug',
-        'value' => 'my-product',
-    ]);
+$product = perch_collection('Products', [
+    'template' => 'products/detail.html',
+    'skip-template' => true,
+    'return-html' => true,
+    'filter' => 'slug',
+    'value' => 'my-product',
+]);
 
 
-    if(isset($product[0])) {
-        array_walk($product[0]['categories'], function(&$category) {
-            $category = pipit_category_get_id($category);
-        })
+if(isset($product[0])) {
+    array_walk($product[0]['categories'], function(&$category) {
+        $category = pipit_category_get_id($category);
+    })
 
-        // output rendered content/products/detail.html
-        echo $product['html'];
+    // output rendered content/products/detail.html
+    echo $product['html'];
 
-        // render another template using the same product data without making another database query
-        perch_template('content/products/another_template.html', $product[0]);
-    }
-    
+    // render another template using the same product data without making another database query
+    perch_template('content/products/another_template.html', $product[0]);
+}
 ```
 
 
@@ -311,13 +310,19 @@ The function only attempts to retrieve the category ID if `$source` is not numer
 
 ### pipit_get_collection_key_for()
 
-Get the key of the collection an item belongs to.
+Get the key of the collection an item belongs to (given the item ID):
 
 ```php
-    perch_collection(['Blog', 'News'], [
-        'each' => function($item) {
-            $item['collectionKey'] = pipit_get_collection_key_for($item['_id']);
-            return $item;
-        }
-    ]);
+pipit_get_collection_key_for($itemID);
+```
+
+This is useful when you know the a collection item ID, but you don't know which collection it belongs to. For example, if you're outputting items from multiple collections at once:
+
+```php
+perch_collection(['Blog', 'News'], [
+    'each' => function($item) {
+        $item['collectionKey'] = pipit_get_collection_key_for($item['_id']);
+        return $item;
+    }
+]);
 ```
