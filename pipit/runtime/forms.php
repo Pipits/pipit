@@ -50,7 +50,7 @@
         
 
         $content_type = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
-        if (strpos( $content_type, "application/json" ) != false) {
+        if (strpos( $content_type, "application/json" ) !== false) {
             $result = pipit_form_handle_json($formID, $opts);
         } else {
             $result = pipit_form_handle_post($formID, $opts);
@@ -104,10 +104,6 @@
      * 
      */
     function pipit_form_handle_json($formID, $opts = []) {
-        $content_type = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
-
-        if (strpos( $content_type, "application/json" ) == false) return false;
-        
         $content = trim(file_get_contents("php://input"));
         $data = json_decode($content, true);
         if($data == NULL) return false;
