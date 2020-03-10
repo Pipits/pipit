@@ -2,6 +2,7 @@
 
     include(__DIR__.'/runtime/util.php');
     include(__DIR__.'/runtime/categories.php');
+    include(__DIR__.'/runtime/forms.php');
 
 
     /**
