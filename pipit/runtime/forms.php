@@ -45,7 +45,7 @@
             'message' => 'The form was not submitted',
         ];
 
-        $default_opts = ['dispatch' => true];
+        $default_opts = ['dispatch' => false];
         $opts = array_merge($default_opts, $opts);
         
 
@@ -90,6 +90,7 @@
 
 
         if($return) return $response;
+        header('Content-Type: application/json');
         http_response_code($response['status']);
         echo json_encode($response);
         exit;
@@ -117,6 +118,8 @@
             // template
             if ($template_path && substr($template_path, -5)!=='.html') $template_path .= '.html';
             $template_path = "/templates/$template_path";
+            $template_file  = PerchUtil::file_path(PERCH_TEMPLATE_PATH.'/'.$template_path);
+            if(!is_file($template_file)) return false;
 
             // generate form key
             $key = base64_encode("$formID:$app:$template_path");
@@ -168,6 +171,8 @@
             // template
             if ($template_path && substr($template_path, -5)!=='.html') $template_path .= '.html';
             $template_path = "/templates/$template_path";
+            $template_file  = PerchUtil::file_path(PERCH_TEMPLATE_PATH.'/'.$template_path);
+            if(!is_file($template_file)) return false;
 
             // generate form key
             $key = base64_encode("$formID:$app:$template_path");
