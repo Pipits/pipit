@@ -24,4 +24,13 @@ class Pipit_Util {
     }
 
 
+    /**
+     * 
+     */
+    public static function is_json_content_type() {
+        $content_type = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+        if (strpos( $content_type, "application/json" ) !== false) return true;
+        return false;
+    }
+
 }

@@ -13,9 +13,9 @@
      * 
      */
     function pipit_form_response($formID, $opts = [], $return = false) {
+        $status = 404;
         $response = [
-            'status' => 404,
-            'errors' => [],
+            'errors' => false,
             'message' => 'The form was not submitted',
         ];
         
@@ -23,10 +23,11 @@
         $key = false;
         $default_opts = ['dispatch' => false];
         $opts = array_merge($default_opts, $opts);
-        $content_type = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+        $is_json_response = Pipit_Util::is_json_content_type();
+        
 
 
-        if (strpos( $content_type, "application/json" ) !== false) {
+        if ($is_json_response) {
             $content = trim(file_get_contents("php://input"));
             $data = json_decode($content, true);
         } else {
@@ -34,7 +35,12 @@
         }
 
 
-        if($data == NULL) return false;
+        if($data == NULL) {
+            $status = 500;
+            $response['message'] = 'No data received';
+            return pipit_respond($status, $response, $return);
+            return false;
+        }
 
 
 
@@ -44,7 +50,9 @@
 
             // template
             if( ! Pipit_Util::template_exists($template_path) ) {
-                return false;
+                $status = 500;
+                $response['message'] = 'Template not found';
+                return pipit_respond($status, $response, $return);
             }
 
             // generate form key
@@ -57,52 +65,60 @@
             unset($data['cms-form'], $_POST['cms-form']);
 
             $key_formID = pipit_get_formID_from_key($key);
-            // if($formID != $key_formID) return false;
-            
+            if($formID != $key_formID) {
+                $status = 500;
+                $response['message'] = 'Form ID does not match';
+                return pipit_respond($status, $response, $return);
+            }
         }
 
 
         
-        if(!$key) return false;
-
-
-        $Perch = Perch::fetch();
-
-        if($formID != pipit_get_formID_from_key( $key )) {
-            // do something
+        if(!$key) {
+            $status = 500;
+            $response['message'] = 'No form key found';
+            return pipit_respond($status, $response, $return);
         }
 
 
+        $Perch = Perch::fetch();
         if($opts['dispatch']) {
             // SubmittedForm relies on $_POST for validation
+            if($is_json_response) $_POST = array_merge($_POST, $data);
+
             // dispatch and let Perch call the relevant {app}_form_handler() functions
-            $_POST = array_merge($_POST, $data);
             $Perch->dispatch_form($key, $data, $_FILES);
         }
 
 
         // get form errors logged by SubmittedForm
         $response['errors'] = $Perch->get_form_errors($formID);
-
-        if(empty($response['errors'])) {
-            $response['status'] = 200;
-            $response['message'] = 'The form was submitted successfully';
-        } else {
-            $response['status'] = 422;
+        if($response['errors']) {
+            $status = 422;
             $response['message'] = 'You have some errors';
+        } else {
+            $status = 200;
+            $response['message'] = 'The form was submitted successfully';
         }
         
 
+        return pipit_respond($status, $response, $return);
+    }
 
+
+
+
+    /**
+     * 
+     */
+    function pipit_respond($status, $response, $return) {
+        $response['status'] = $status;
         if($return) return $response;
         header('Content-Type: application/json');
         http_response_code($response['status']);
         echo json_encode($response);
         exit;
     }
-
-
-
     
 
 
