@@ -13,6 +13,8 @@ class Pipit_Util {
     }
 
 
+
+    
     /**
      * 
      */
@@ -24,6 +26,8 @@ class Pipit_Util {
     }
 
 
+
+
     /**
      * 
      */
@@ -31,6 +35,18 @@ class Pipit_Util {
         $content_type = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
         if (strpos( $content_type, "application/json" ) !== false) return true;
         return false;
+    }
+
+
+
+
+    /**
+     * 
+     */
+    public static function get_formID_from_key($key) {
+        $key = base64_decode($key);
+        $parts = explode(':', $key);
+        return isset($parts[0]) ? $parts[0] : '';
     }
 
 }

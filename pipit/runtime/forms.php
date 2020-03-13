@@ -64,7 +64,7 @@
             $key = $data['cms-form'];
             unset($data['cms-form'], $_POST['cms-form']);
 
-            $key_formID = pipit_get_formID_from_key($key);
+            $key_formID = Pipit_Util::get_formID_from_key($key);
             if($formID != $key_formID) {
                 $status = 500;
                 $response['debug'] = 'Form ID does not match';
@@ -108,158 +108,9 @@
 
 
 
-    /**
-     * 
-     */
-    function pipit_respond($status, $response, $return) {
-        $response['status'] = $status;
-        $dev_modes = [PERCH_DEVELOPMENT, PERCH_STAGING];
-        if(!PERCH_DEBUG && !in_array(PERCH_PRODUCTION_MODE, $dev_modes)) unset($response['debug']);
-
-        if($return) return $response;
-        header('Content-Type: application/json');
-        http_response_code($response['status']);
-        echo json_encode($response);
-        exit;
-    }
+    
     
 
-
-    /**
-     * 
-     */
-    function pipit_form_handle_json($formID, $opts = []) {
-        $content = trim(file_get_contents("php://input"));
-        $data = json_decode($content, true);
-        if($data == NULL) return false;
-
-
-        if( isset($opts['template'], $opts['app']) ) {
-            $template_path = $opts['template'];
-            $app = $opts['app'];
-
-            // template
-            if ($template_path && substr($template_path, -5)!=='.html') $template_path .= '.html';
-            $template_path = "/templates/$template_path";
-            $template_file  = PerchUtil::file_path(PERCH_TEMPLATE_PATH.'/'.$template_path);
-            if(!is_file($template_file)) return false;
-
-            // generate form key
-            $key = base64_encode("$formID:$app:$template_path");
-            
-            return [
-                'key' => $key,
-                'data' => $data,
-                'files' => $_FILES
-            ];
-        }
-
-
-
-        if(isset($data['cms-form'])) {
-            $key = $data['cms-form'];
-
-            $key_formID = pipit_get_formID_from_key($key);
-            // if($formID != $key_formID) return false;            
-            unset($data['cms-form']);
-            
-            return [
-                'key' => $key,
-                'data' => $data,
-                'files' => $_FILES
-            ];
-        }
-
-
-        return false;
-    }
-
-
-
-
-
-
-    /**
-     * 
-     */
-    function pipit_form_handle_post($formID, $opts =[]) {
-        $data = $_POST;
-        $form_submitted = false;
-
-        
-        if(isset($opts['template'], $opts['app'])) {
-            $template_path = $opts['template'];
-            $app = $opts['app'];
-
-            // template
-            if ($template_path && substr($template_path, -5)!=='.html') $template_path .= '.html';
-            $template_path = "/templates/$template_path";
-            $template_file  = PerchUtil::file_path(PERCH_TEMPLATE_PATH.'/'.$template_path);
-            if(!is_file($template_file)) return false;
-
-            // generate form key
-            $key = base64_encode("$formID:$app:$template_path");
-
-            return [
-                'key' => $key,
-                'data' => $data,
-                'files' => $_FILES
-            ];
-        }
-        
-
-        if(isset($data['cms-form'])) {
-            $key = $data['cms-form'];
-
-            $key_formID = pipit_get_formID_from_key($key);
-            unset($data['cms-form']);
-
-            if($formID != $key_formID) return false;
-
-            return [
-                'key' => $key,
-                'data' => $data,
-                'files' => $_FILES
-            ];
-        }
-
-
-        
-        
-        return false;
-    }
-
-
-
-
-
-    /**
-     * 
-     */
-    function pipit_get_formID_from_key($key) {
-        $key = base64_decode($key);
-        $parts = explode(':', $key);
-        return isset($parts[0]) ? $parts[0] : '';
-    }
-
-
-    /**
-     * 
-     */
-    function pipit_get_form_key_parts($key) {
-        $key = base64_decode($key);
-        $parts = explode(':', $key);
-        return $parts;
-    }
-
-
-    /**
-     * 
-     */
-    // function pipit_posted_form_response($formID) {
-    //     perch_find_posted_forms();
-    //     return pipit_form_response($formID);
-    // }
 
 
     /**
