@@ -116,7 +116,7 @@
     /**
      * 
      */
-    function pipit_set_form_error_vars() {
+    function pipit_form_set_error_vars() {
         $Perch = Perch::fetch();
         $vars = [];
 
