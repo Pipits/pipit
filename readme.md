@@ -326,3 +326,8 @@ perch_collection(['Blog', 'News'], [
     }
 ]);
 ```
+
+
+### And more
+
+Go to the [documentation](https://grabapipit.com/pipits/apps/pipit) for the full list of functions.
