@@ -200,8 +200,13 @@
      */
     function pipit_respond($status, $response, $return) {
         $response['status'] = $status;
-        $dev_modes = [PERCH_DEVELOPMENT, PERCH_STAGING];
-        if(!PERCH_DEBUG && !in_array(PERCH_PRODUCTION_MODE, $dev_modes)) unset($response['debug']);
+        
+        if(PERCH_DEBUG) {
+            $response['perch_debug'] = PerchUtil::get_debug();
+        } else {
+            unset($response['debug']);
+        }
+        
 
         if($return) return $response;
         header('Content-Type: application/json');
