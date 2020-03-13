@@ -1,36 +1,11 @@
 <?php
-    /**
-     * 
-     */
-    // function pipit_form_response($formID, $check_key_in_post = true, $form_submitted = true) {
-    //     $result = [
-    //         'status' => 404,
-    //         'errors' => [],
-    //         'message' => 'The form was not submitted',
-    //     ];
-
-        
-    //     // check the form was submitted from $_POST
-    //     if($check_key_in_post && $formID != pipit_get_formID_from_key( PerchUtil::post('cms-form') )) $form_submitted = false;
-        
-
-    //     if($form_submitted) {
-    //         $Perch = Perch::fetch();
-    //         $result['errors'] = $Perch->get_form_errors($formID);
-    
-    //         if(empty($result['errors'])) {
-    //             $result['status'] = 200;
-    //             $result['message'] = 'The form was submitted successfully';
-    //         } else {
-    //             $result['status'] = 422;
-    //             $result['message'] = 'You have some errors';
-    //         }
-    //     }
-
-
-    //     PerchUtil::debug($result);
-    //     return $result;
-    // }
+    spl_autoload_register(function($class_name){
+		if (strpos($class_name, 'Pipit_')===0) {
+			include(PERCH_PATH.'/addons/apps/pipit/lib/'.$class_name.'.class.php');
+			return true;
+		}
+		return false;
+	});
 
 
 
@@ -38,55 +13,85 @@
      * 
      */
     function pipit_form_response($formID, $opts = [], $return = false) {
-        $form_submitted = true;
         $response = [
             'status' => 404,
             'errors' => [],
             'message' => 'The form was not submitted',
         ];
-
+        
+        
+        $key = false;
         $default_opts = ['dispatch' => false];
         $opts = array_merge($default_opts, $opts);
-        
-
         $content_type = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+
+
         if (strpos( $content_type, "application/json" ) !== false) {
-            $result = pipit_form_handle_json($formID, $opts);
+            $content = trim(file_get_contents("php://input"));
+            $data = json_decode($content, true);
         } else {
-            $result = pipit_form_handle_post($formID, $opts);
+            $data = $_POST;
         }
 
 
+        if($data == NULL) return false;
 
 
-        if($result) {
-            $Perch = Perch::fetch();
 
-            if($formID != pipit_get_formID_from_key( $result['key'] )) {
-                // do something
+        if( isset($opts['template'], $opts['app']) ) {
+            $template_path = $opts['template'];
+            $app = $opts['app'];
+
+            // template
+            if( ! Pipit_Util::template_exists($template_path) ) {
+                return false;
             }
 
+            // generate form key
+            $template_path = Pipit_Util::format_template_path($template_path);
+            $key = base64_encode("$formID:$app:$template_path");
+            
 
-            if($opts['dispatch']) {
-                // SubmittedForm relies on $_POST for validation
-                $_POST = array_merge($_POST, $result['data']);
-    
-                // dispatch and let Perch call the relevant {app}_form_handler() functions
-                $Perch->dispatch_form($result['key'], $result['data'], $result['files']);
-            }
+        } elseif(isset($data['cms-form'])) {
+            $key = $data['cms-form'];
+            unset($data['cms-form'], $_POST['cms-form']);
 
-
-            // get form errors logged by SubmittedForm
-            $response['errors'] = $Perch->get_form_errors($formID);
-    
-            if(empty($response['errors'])) {
-                $response['status'] = 200;
-                $response['message'] = 'The form was submitted successfully';
-            } else {
-                $response['status'] = 422;
-                $response['message'] = 'You have some errors';
-            }
+            $key_formID = pipit_get_formID_from_key($key);
+            // if($formID != $key_formID) return false;
+            
         }
+
+
+        
+        if(!$key) return false;
+
+
+        $Perch = Perch::fetch();
+
+        if($formID != pipit_get_formID_from_key( $key )) {
+            // do something
+        }
+
+
+        if($opts['dispatch']) {
+            // SubmittedForm relies on $_POST for validation
+            // dispatch and let Perch call the relevant {app}_form_handler() functions
+            $_POST = array_merge($_POST, $data);
+            $Perch->dispatch_form($key, $data, $_FILES);
+        }
+
+
+        // get form errors logged by SubmittedForm
+        $response['errors'] = $Perch->get_form_errors($formID);
+
+        if(empty($response['errors'])) {
+            $response['status'] = 200;
+            $response['message'] = 'The form was submitted successfully';
+        } else {
+            $response['status'] = 422;
+            $response['message'] = 'You have some errors';
+        }
+        
 
 
         if($return) return $response;
@@ -111,7 +116,6 @@
 
 
         if( isset($opts['template'], $opts['app']) ) {
-
             $template_path = $opts['template'];
             $app = $opts['app'];
 

@@ -1,0 +1,27 @@
+<?php
+
+class Pipit_Util {
+    
+    /**
+     * 
+     */
+    public static function template_exists($template_path) {
+        $template_path = Pipit_Util::format_template_path($template_path, false);
+        $template_file  = PerchUtil::file_path(PERCH_TEMPLATE_PATH.'/'.$template_path);
+        if(!is_file($template_file)) return false;
+        return true;
+    }
+
+
+    /**
+     * 
+     */
+    public static function format_template_path($template_path, $include_dir = true) {
+        if ($template_path && substr($template_path, -5)!=='.html') $template_path .= '.html';
+        if($include_dir) $template_path = "/templates/$template_path";
+
+        return $template_path;
+    }
+
+
+}
