@@ -16,7 +16,7 @@
         $status = 404;
         $response = [
             'errors' => false,
-            'message' => 'The form was not submitted',
+            'debug' => 'The form was not submitted',
         ];
         
         
@@ -37,7 +37,7 @@
 
         if($data == NULL) {
             $status = 500;
-            $response['message'] = 'No data received';
+            $response['debug'] = 'No data received';
             return pipit_respond($status, $response, $return);
             return false;
         }
@@ -51,7 +51,7 @@
             // template
             if( ! Pipit_Util::template_exists($template_path) ) {
                 $status = 500;
-                $response['message'] = 'Template not found';
+                $response['debug'] = 'Template not found';
                 return pipit_respond($status, $response, $return);
             }
 
@@ -67,7 +67,7 @@
             $key_formID = pipit_get_formID_from_key($key);
             if($formID != $key_formID) {
                 $status = 500;
-                $response['message'] = 'Form ID does not match';
+                $response['debug'] = 'Form ID does not match';
                 return pipit_respond($status, $response, $return);
             }
         }
@@ -76,7 +76,7 @@
         
         if(!$key) {
             $status = 500;
-            $response['message'] = 'No form key found';
+            $response['debug'] = 'No form key found';
             return pipit_respond($status, $response, $return);
         }
 
@@ -95,10 +95,10 @@
         $response['errors'] = $Perch->get_form_errors($formID);
         if($response['errors']) {
             $status = 422;
-            $response['message'] = 'You have some errors';
+            $response['debug'] = 'You have some errors';
         } else {
             $status = 200;
-            $response['message'] = 'The form was submitted successfully';
+            $response['debug'] = 'The form was submitted successfully';
         }
         
 
@@ -113,6 +113,9 @@
      */
     function pipit_respond($status, $response, $return) {
         $response['status'] = $status;
+        $dev_modes = [PERCH_DEVELOPMENT, PERCH_STAGING];
+        if(!PERCH_DEBUG && !in_array(PERCH_PRODUCTION_MODE, $dev_modes)) unset($response['debug']);
+
         if($return) return $response;
         header('Content-Type: application/json');
         http_response_code($response['status']);
