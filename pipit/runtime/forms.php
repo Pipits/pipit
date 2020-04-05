@@ -92,10 +92,15 @@
 
 
         // get form errors logged by SubmittedForm
-        $response['errors'] = $Perch->get_form_errors($formID);
-        if($response['errors']) {
+        $errors = $Perch->get_form_errors($formID);
+        if($errors) {
             $status = 422;
             $response['debug'] = 'You have some errors';
+            array_walk($errors, function(&$item){ 
+                $item = ['type' => $item]; 
+            });
+
+            $response['errors'] = Pipit_Util::get_form_js_error_messages($key, $errors);
         } else {
             $status = 200;
             $response['debug'] = 'The form was submitted successfully';
