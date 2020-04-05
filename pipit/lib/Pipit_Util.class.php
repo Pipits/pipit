@@ -68,12 +68,16 @@ class Pipit_Util {
         if(PerchUtil::count($error_tags)) {
             foreach($error_tags as $Tag) {
 
-                if(!$Tag->is_set('for') || !$Tag->is_set('type') || !$Tag->is_set('js')) continue;
+                if(!$Tag->is_set('for') || !$Tag->is_set('type')) continue;
                 $for = $Tag->attributes['for'];
                 $type = $Tag->attributes['type'];
 
                 if(isset($errors[$for]) && $errors[$for]['type'] == $type) {
-                    $errors[$for]['message'] = $Tag->attributes['js'];
+                    $response_attrs = $Tag->search_attributes_for('response-');
+                    
+                    foreach($response_attrs as $key => $val) {
+                        $errors[$for][str_replace('response-', '', $key)] = $val;
+                    }
                 }
 
             }
