@@ -60,9 +60,24 @@ class Pipit_Util {
         $Template = $API->get('Template');
         
         $template_path = Pipit_Util::get_form_key_parts($key, 'template');
-        $template_path = ltrim($template_path, DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
 
-        if( !$Template->set($template_path, 'forms') ) $errors;
+        // remove /templates/ prefix from path
+        $prefix = '/templates/';
+        $prefix_alt = PerchUtil::file_path($prefix);
+
+        if (substr($template_path, 0, strlen($prefix)) == $prefix) {
+            $template_path = substr($template_path, strlen($prefix));
+        } elseif (substr($template_path, 0, strlen($prefix_alt)) == $prefix_alt) {
+            $template_path = substr($template_path, strlen($prefix_alt));
+        }
+
+
+        if( $Template->set($template_path, 'forms') == 404 ) {
+            return $errors;
+        } 
+
+
+        
         $error_tags = $Template->find_all_tags('error');
 
         if(PerchUtil::count($error_tags)) {
